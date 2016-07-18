@@ -25,17 +25,19 @@ def memory
 end
 
 def model
-  doc = Nokogiri::XML(open("http://support-sp.apple.com/sp/product?cc=FVH6&lang=en"))
+  last_4_serial_number = serial_number()[-4,4]
+  doc = Nokogiri::XML(open("http://support-sp.apple.com/sp/product?cc=#{last_4_serial_number}&lang=en"))
 
   mac_model = doc.xpath('//root')
   mac_model.xpath('//configCode').text
 end
 
 def print_about_mac
-  puts "Serial Number: " + serial_number
+  puts model
+  puts '--------------------------------'
   puts "Processor: " + processor
   puts "Memory: " + memory
-  puts "Model: " + model
+  puts "Serial Number: " + serial_number
 end
 
 print_about_mac
