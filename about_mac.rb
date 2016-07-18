@@ -1,4 +1,7 @@
 #!/usr/bin/env ruby
+require 'nokogiri'
+require 'open-uri'
+
 def get_value_only(property)
   property.split(':')[1].delete!("\n").strip()
 end
@@ -21,10 +24,18 @@ def memory
   get_value_only(memory)
 end
 
+def model
+  doc = Nokogiri::XML(open("http://support-sp.apple.com/sp/product?cc=FVH6&lang=en"))
+
+  mac_model = doc.xpath('//root')
+  mac_model.xpath('//configCode').text
+end
+
 def print_about_mac
   puts "Serial Number: " + serial_number
   puts "Processor: " + processor
   puts "Memory: " + memory
+  puts "Model: " + model
 end
 
 print_about_mac
