@@ -26,9 +26,23 @@ def memory
   memory_size + ' - ' + memory_speed + ' - ' + memory_type
 end
 
+def model_offline
+  `sysctl -n hw.model`
+end
+
 def model
   last_4_serial_number = serial_number()[-4,4]
-  doc = Nokogiri::XML(open("http://support-sp.apple.com/sp/product?cc=#{last_4_serial_number}&lang=en"))
+  begin
+    doc = Nokogiri::XML(open("http://support-sp.apple.com/sp/product?cc=#{last_4_serial_number}&lang=en"))
+    mac_model = doc.xpath('//root')
+    model_info = mac_model.xpath('//configCode').text
+
+  rescue => error
+    model_info = model_offline
+  end
+
+  model_info
+end
 
   mac_model = doc.xpath('//root')
   mac_model.xpath('//configCode').text
