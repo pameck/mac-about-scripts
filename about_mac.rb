@@ -20,8 +20,10 @@ def serial_number
 end
 
 def memory
-  memory=`system_profiler SPHardwareDataType | grep Memory`
-  get_value_only(memory)
+  memory_size= get_value_only(`system_profiler SPHardwareDataType | grep Memory`)
+  memory_type= get_value_only(`system_profiler SPMemoryDataType | grep -m 1 Type`)
+  memory_speed= get_value_only(`system_profiler SPMemoryDataType | grep -m 1 Speed`)
+  memory_size + ' - ' + memory_speed + ' - ' + memory_type
 end
 
 def model
