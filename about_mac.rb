@@ -44,8 +44,10 @@ def model
   model_info
 end
 
-  mac_model = doc.xpath('//root')
-  mac_model.xpath('//configCode').text
+def battery
+  battery_condition= get_value_only(`system_profiler SPPowerDataType | grep -i Condition`)
+  battery_cycles= get_value_only(`system_profiler SPPowerDataType | grep -i "Cycle count"`)
+  'Condition: ' + battery_condition + ' / Cycles: ' + battery_cycles
 end
 
 def print_about_mac
@@ -54,6 +56,7 @@ def print_about_mac
   puts "Processor: " + processor
   puts "Memory: " + memory
   puts "Serial Number: " + serial_number
+  puts "Battery Health: " + battery
 end
 
 print_about_mac
