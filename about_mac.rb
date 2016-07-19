@@ -56,6 +56,12 @@ def graphic_card
   chip + ' - ' + vram
 end
 
+def hard_drive
+  capacity = get_value_only(`system_profiler SPSerialATADataType | grep -i -m 1 capacity`)
+  type = get_value_only(`system_profiler SPSerialATADataType | grep -i "medium type"`)
+  type + ' - ' + capacity
+end
+
 def print_about_mac
   puts model
   puts '--------------------------------'
@@ -64,6 +70,7 @@ def print_about_mac
   puts "Serial Number: " + serial_number
   puts "Battery Health: " + battery
   puts "Graphics: " + graphic_card
+  puts "Storage: " + hard_drive
 end
 
 print_about_mac
