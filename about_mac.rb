@@ -45,9 +45,15 @@ def model
 end
 
 def battery
-  battery_condition= get_value_only(`system_profiler SPPowerDataType | grep -i Condition`)
-  battery_cycles= get_value_only(`system_profiler SPPowerDataType | grep -i "Cycle count"`)
+  battery_condition= get_value_only(`system_profiler SPPowerDataType | grep -i condition`)
+  battery_cycles= get_value_only(`system_profiler SPPowerDataType | grep -i "cycle count"`)
   'Condition: ' + battery_condition + ' / Cycles: ' + battery_cycles
+end
+
+def graphic_card
+  chip = get_value_only(`system_profiler SPDisplaysDataType | grep -i chipset`)
+  vram = get_value_only(`system_profiler SPDisplaysDataType | grep -i vram`)
+  chip + ' - ' + vram
 end
 
 def print_about_mac
@@ -57,6 +63,7 @@ def print_about_mac
   puts "Memory: " + memory
   puts "Serial Number: " + serial_number
   puts "Battery Health: " + battery
+  puts "Graphics: " + graphic_card
 end
 
 print_about_mac
