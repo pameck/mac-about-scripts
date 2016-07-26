@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 require 'nokogiri'
 require 'open-uri'
+require 'json'
+require 'rubygems'
+require 'aws-sdk'
 
 def get_value_only(property)
   property.split(':')[1].delete!("\n").strip()
@@ -66,21 +69,64 @@ def hard_drive
   {"type" => type, "capacity" => capacity}
 end
 
-def print_about_mac
-  processor_info = processor
-  memory_info = memory
-  battery_info = battery
-  graphic_card_info = graphic_card
-  hard_drive_info = hard_drive
+def about_mac
+  {
+    "model" => model,
+    "processor" => processor,
+    "memory" => memory,
+    "battery" => battery,
+    "graphic_card" => graphic_card,
+    "hard_drive" => hard_drive,
+    "serial" => serial_number
+  }
+end
 
-  puts model
+def to_json_file(the_info, file_name)
+  out_file = File.new(file_name, "w")
+  out_file.puts(the_info.to_json)
+  out_file.close
+end
+
+# sudo gem install aws-sdk && ruby about_mac.rb
+def upload_to_s3
+  bucket_name = 'techops-tests'
+  file_name = 'out.json'
+
+  to_json_file(about_mac, file_name)
+
+  puts "Hi! I am going to need the AWS access key"
+  access_key_id = gets.chomp
+
+  puts "and now the secret..."
+  secret_access_key = gets.chomp
+
+  s3 = Aws::S3::Resource.new(
+    region: 'ap-southeast-2',
+    access_key_id: access_key_id,
+    secret_access_key: secret_access_key
+  )
+
+  file = File.basename file_name
+  obj = s3.bucket(bucket_name).object(file)
+
+  if obj.upload_file(file)
+    puts "Uploaded #{file} to bucket #{bucket_name}"
+  else
+    puts "Could not upload #{file} to bucket #{bucket_name}!"
+  end
+end
+
+def print_about_mac
+  the_mac = about_mac
+
+  puts the_mac["model"]
   puts '--------------------------------'
-  puts "Processor: " + processor_info["name"] + ' - ' + processor_info["speed"]
-  puts "Memory: " + memory_info["size"] + ' - ' + memory_info["speed"] + ' - ' + memory_info["type"]
-  puts "Serial Number: " + serial_number
-  puts "Battery Condition: " + battery_info["condition"] + ' / Cycles: ' + battery_info["cycles"]
-  puts "Graphics: " + graphic_card_info["chip"] + " - " + graphic_card_info["vram"]
-  puts "Storage: " + hard_drive_info["type"] + " - " + hard_drive_info["capacity"]
+  puts "Processor: " + the_mac["processor"]["name"] + ' - ' + the_mac["processor"]["speed"]
+  puts "Memory: " + the_mac["memory"]["size"] + ' - ' + the_mac["memory"]["speed"] + ' - ' + the_mac["memory"]["type"]
+  puts "Serial Number: " + the_mac["serial"]
+  puts "Battery Condition: " + the_mac["battery"]["condition"] + ' / Cycles: ' + the_mac["battery"]["cycles"]
+  puts "Graphics: " + the_mac["graphic_card"]["chip"] + " - " + the_mac["graphic_card"]["vram"]
+  puts "Storage: " + the_mac["hard_drive"]["type"] + " - " + the_mac["hard_drive"]["capacity"]
 end
 
 print_about_mac
