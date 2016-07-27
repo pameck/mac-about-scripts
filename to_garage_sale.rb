@@ -131,14 +131,40 @@ def print_mac_info(the_mac)
   puts '--------------------------------'
 end
 
-def run_script
+def to_garage_sale
+  $options = {}
+  OptionParser.new do |opt|
+    opt.on('--s3_key KEY') { |o| $options[:s3_key] = o }
+    opt.on('--s3_secret SECRET') { |o| $options[:s3_secret] = o }
+  end.parse!
+
   mac_info = about_mac
 
   puts "\n"
-  puts '********** This is the information of this Mac **********'
+  puts '********** This is the information for this Mac **********'
   puts "\n"
   print_mac_info(mac_info)
+  puts "\n"
+  puts "How much is it?"
+  price = gets.chomp
+  puts "\n"
+  puts "Please write a description?"
+  description = gets.chomp
+
+  mac_info["price"] = price
+  mac_info["description"] = description
+
+  puts "\n \n"
+  puts "Please review the summary: \n"
+  puts print_mac_info(mac_info)
+  puts "\n"
+  puts "Are you sure you want to upload this informatio to Garage Sale? (y|n)"
+  confirmation = gets.chomp
+
+  if confirmation == 'y'
+    upload_to_s3(mac_info, mac_info["serial"] + '.json')
+  end
 
 end
 
-run_script
+to_garage_sale
