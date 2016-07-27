@@ -145,10 +145,10 @@ def to_garage_sale
   puts "\n"
   print_mac_info(mac_info)
   puts "\n"
-  puts "How much is it?"
+  puts "Plese enter the starting bid value (just the number, not the currency): "
   price = gets.chomp
   puts "\n"
-  puts "Please write a description?"
+  puts "Please write a description for the ad:"
   description = gets.chomp
 
   mac_info["price"] = price
