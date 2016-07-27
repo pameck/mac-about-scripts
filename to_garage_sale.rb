@@ -105,6 +105,7 @@ def upload_to_s3(info, file_name)
 
   if obj.upload_file(file)
     puts "Uploaded #{file} to bucket #{bucket_name}"
+    File.delete(file_name)
   else
     puts "Could not upload #{file} to bucket #{bucket_name}!"
   end
